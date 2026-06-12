@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from pypdf import PdfReader
@@ -292,52 +293,69 @@ if st.button("🚀 Start Semantic Screening"):
         results.sort(key=lambda x: x["score"], reverse=True)
 
     st.success("Screening Complete!")
-    st.subheader("🏆 Candidate Leaderboard")
     
-    report = "AI Resume Match Report\n" + "="*40 + "\n\n"
+    # 2 Column layout for Results leaderboard and Visual Analytics
+    res_col1, res_col2 = st.columns([3, 2], gap="large")
     
-    for rank, candidate in enumerate(results[:top_k], start=1):
-        score = candidate["score"]
+    with res_col1:
+        st.subheader("🏆 Candidate Leaderboard")
         
-        # Determine status & badge
-        if score >= 80:
-            badge_class = "badge-strong"
-            status = "Strong Match"
-        elif score >= 60:
-            badge_class = "badge-good"
-            status = "Good Match"
-        else:
-            badge_class = "badge-low"
-            status = "Low Match"
+        report = "AI Resume Match Report\n" + "="*40 + "\n\n"
+        
+        for rank, candidate in enumerate(results[:top_k], start=1):
+            score = candidate["score"]
             
-        # Premium card representation with progress bar aligned inside the card container
-        card_html = f"""
-        <div class="candidate-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                <h4 style="margin: 0; color: #ffffff; font-size: 1.35rem; font-weight:600;">#{rank} — {candidate['name']}</h4>
-                <span class="badge {badge_class}">{status}</span>
+            # Determine status & badge
+            if score >= 80:
+                badge_class = "badge-strong"
+                status = "Strong Match"
+            elif score >= 60:
+                badge_class = "badge-good"
+                status = "Good Match"
+            else:
+                badge_class = "badge-low"
+                status = "Low Match"
+                
+            # Premium card representation with progress bar aligned inside the card container
+            card_html = f"""
+            <div class="candidate-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <h4 style="margin: 0; color: #ffffff; font-size: 1.35rem; font-weight:600;">#{rank} — {candidate['name']}</h4>
+                    <span class="badge {badge_class}">{status}</span>
+                </div>
+                <p style="margin: 0.5rem 0 0.75rem 0; color: #94a3b8; font-size: 0.95rem; line-height: 1.5;">
+                    <strong>Preview:</strong> {candidate['text_snippet']}
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <span style="font-weight: 700; color: #ec4899; font-size: 1.15rem;">{score}% Match</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: {max(0, min(score, 100))}%;"></div>
+                </div>
             </div>
-            <p style="margin: 0.5rem 0 0.75rem 0; color: #94a3b8; font-size: 0.95rem; line-height: 1.5;">
-                <strong>Preview:</strong> {candidate['text_snippet']}
-            </p>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-                <span style="font-weight: 700; color: #ec4899; font-size: 1.15rem;">{score}% Match</span>
-            </div>
-            <div class="progress-bar-container">
-                <div class="progress-bar-fill" style="width: {max(0, min(score, 100))}%;"></div>
-            </div>
-        </div>
-        """
-        st.markdown(card_html, unsafe_allow_html=True)
+            """
+            st.markdown(card_html, unsafe_allow_html=True)
+            
+            report += (
+                f"Rank #{rank}\n"
+                f"Candidate: {candidate['name']}\n"
+                f"Match Score: {score}%\n"
+                f"Status: {status}\n"
+                + "-" * 40 + "\n"
+            )
+            
+    with res_col2:
+        st.subheader("📊 Match Score Analytics")
+        # Build pandas DataFrame for comparison chart
+        chart_df = pd.DataFrame({
+            "Candidate": [c["name"] for c in results[:top_k]],
+            "Match Percentage": [c["score"] for c in results[:top_k]]
+        }).set_index("Candidate")
         
-        report += (
-            f"Rank #{rank}\n"
-            f"Candidate: {candidate['name']}\n"
-            f"Match Score: {score}%\n"
-            f"Status: {status}\n"
-            + "-" * 40 + "\n"
-        )
+        # Display elegant Streamlit bar chart
+        st.bar_chart(chart_df, height=350)
         
+    st.divider()
     st.markdown("### 💾 Export Results")
     st.download_button(
         label="📥 Download Match Report",
