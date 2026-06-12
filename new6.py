@@ -116,8 +116,20 @@ html, body, [data-testid="stSidebar"], .stMarkdown, p, div, span {
     border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Buttons style */
-.stButton>button {
+/* 
+   Main Screening Button style. 
+   We target only stButton elements that are NOT descendants of stFileUploader 
+*/
+div[data-testid="stFileUploader"] button {
+    /* Reset file uploader button styling to default */
+    background: initial !important;
+    color: initial !important;
+    border: initial !important;
+    box-shadow: initial !important;
+    transform: none !important;
+}
+
+div.stButton > button {
     background: linear-gradient(135deg, #8A2387 0%, #E94057 100%) !important;
     color: white !important;
     border: none !important;
@@ -131,7 +143,7 @@ html, body, [data-testid="stSidebar"], .stMarkdown, p, div, span {
     margin-top: 1rem;
 }
 
-.stButton>button:hover {
+div.stButton > button:hover {
     transform: translateY(-2px) !important;
     box-shadow: 0 6px 22px rgba(233, 64, 87, 0.5) !important;
     opacity: 0.95;
