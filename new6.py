@@ -3,7 +3,7 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from pypdf import PdfReader
 
-# Page config for high-end look
+# Page config for premium look
 st.set_page_config(
     page_title="AI Resume Screening Agent",
     page_icon="🤖",
@@ -11,141 +11,162 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom Premium Styling
+# Custom Premium Dark Theme CSS
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
-/* Main font style */
+/* Global Reset & Base Styling */
 html, body, [data-testid="stSidebar"], .stMarkdown, p, div, span {
     font-family: 'Outfit', sans-serif !important;
 }
 
-/* Centered Header gradient style */
+/* Background Ambient Glow */
+.stApp {
+    background: radial-gradient(circle at 10% 20%, rgba(138, 35, 135, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(242, 113, 33, 0.06) 0%, transparent 40%),
+                #0a0b10 !important;
+}
+
+/* App Header Styling */
 .header-container {
     text-align: center;
-    margin-bottom: 2.5rem;
-    padding-top: 1rem;
+    margin-bottom: 3rem;
+    padding-top: 1.5rem;
 }
 
 .main-header {
-    background: linear-gradient(135deg, #8A2387 0%, #E94057 50%, #F27121 100%);
+    background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f97316 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800;
-    font-size: 3.2rem;
+    font-size: 3.5rem;
     margin-bottom: 0.5rem;
-    display: inline-block;
+    letter-spacing: -1px;
 }
 
 .subheader-text {
-    font-size: 1.2rem;
-    color: #a0aec0;
-    max-width: 700px;
+    font-size: 1.25rem;
+    color: #94a3b8;
+    max-width: 750px;
     margin: 0 auto;
-    line-height: 1.5;
+    line-height: 1.6;
+    font-weight: 300;
 }
 
-/* Modern Card Styling */
+/* Glassmorphism Input Containers */
+.input-panel {
+    background: rgba(30, 41, 59, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* Custom Candidate Card Styling */
 .candidate-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin-top: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    padding: 1.75rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(12px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .candidate-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(233, 64, 87, 0.4);
-    box-shadow: 0 8px 30px rgba(233, 64, 87, 0.15);
-    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-5px);
+    border-color: rgba(236, 72, 153, 0.4);
+    box-shadow: 0 12px 40px rgba(236, 72, 153, 0.15);
+    background: rgba(255, 255, 255, 0.04);
 }
 
-/* Badge styling */
+/* Match Badges with neon-glow effects */
 .badge {
     display: inline-block;
-    padding: 0.35rem 0.85rem;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
 }
 
 .badge-strong {
-    background: rgba(46, 213, 115, 0.15);
-    color: #2ed573;
-    border: 1px solid rgba(46, 213, 115, 0.3);
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.15);
 }
 
 .badge-good {
-    background: rgba(255, 165, 2, 0.15);
-    color: #ffa502;
-    border: 1px solid rgba(255, 165, 2, 0.3);
+    background: rgba(234, 179, 8, 0.1);
+    color: #facc15;
+    border: 1px solid rgba(234, 179, 8, 0.25);
+    box-shadow: 0 0 15px rgba(234, 179, 8, 0.15);
 }
 
 .badge-low {
-    background: rgba(255, 71, 87, 0.15);
-    color: #ff4757;
-    border: 1px solid rgba(255, 71, 87, 0.3);
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
 }
 
-/* Custom progress bar container inside card */
+/* Custom Progress Bar inside Candidate Card */
 .progress-bar-container {
     width: 100%;
-    background-color: rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    height: 8px;
-    margin-top: 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 30px;
+    height: 10px;
+    margin-top: 1.25rem;
     overflow: hidden;
 }
 
 .progress-bar-fill {
-    background: linear-gradient(90deg, #8A2387 0%, #E94057 50%, #F27121 100%);
+    background: linear-gradient(90deg, #a855f7 0%, #ec4899 50%, #f97316 100%);
     height: 100%;
-    border-radius: 10px;
+    border-radius: 30px;
 }
 
-/* Sidebar premium adjustments */
+/* Sidebar Custom Theme */
 [data-testid="stSidebar"] {
-    background-color: #0f111a;
+    background-color: #08090d;
     border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* 
-   Main Screening Button style. 
-   We target only stButton elements that are NOT descendants of stFileUploader 
-*/
+/* Reset file uploader style conflict */
 div[data-testid="stFileUploader"] button {
-    /* Reset file uploader button styling to default */
-    background: initial !important;
-    color: initial !important;
-    border: initial !important;
-    box-shadow: initial !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
     transform: none !important;
 }
 
+/* Premium Screening Button style */
 div.stButton > button {
-    background: linear-gradient(135deg, #8A2387 0%, #E94057 100%) !important;
+    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%) !important;
     color: white !important;
     border: none !important;
-    border-radius: 12px !important;
-    padding: 0.75rem 2rem !important;
-    font-weight: 600 !important;
-    font-size: 1.05rem !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 4px 15px rgba(233, 64, 87, 0.3) !important;
+    border-radius: 14px !important;
+    padding: 0.9rem 2.5rem !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 8px 25px rgba(236, 72, 153, 0.25) !important;
     width: 100%;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
 }
 
-div.stButton > button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 22px rgba(233, 64, 87, 0.5) !important;
+.stButton>button:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 12px 30px rgba(236, 72, 153, 0.45) !important;
     opacity: 0.95;
 }
 
@@ -185,12 +206,12 @@ Required Skills:
 st.markdown("""
 <div class="header-container">
     <div class="main-header">🤖 AI Resume Screening Agent</div>
-    <div class="subheader-text">Deploying semantic intelligence to rank and match applicants with jobs instantly.</div>
+    <div class="subheader-text">Leveraging state-of-the-art semantic embedding algorithms to match and rank applicant files instantly.</div>
 </div>
 """, unsafe_allow_html=True)
 
 # Sidebar
-st.sidebar.markdown("### ⚙️ Settings")
+st.sidebar.markdown("### ⚙️ Control Settings")
 top_k = st.sidebar.slider(
     "Show Top Candidates",
     min_value=1,
@@ -204,7 +225,8 @@ st.sidebar.info("Model active: `all-MiniLM-L6-v2` (SentenceTransformer)")
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col1:
-    st.subheader("📄 Job Description")
+    st.markdown('<div class="input-panel">', unsafe_allow_html=True)
+    st.subheader("📄 Target Role Profile")
     job_description = st.text_area(
         "Target Role Requirements",
         default_jd,
@@ -212,9 +234,11 @@ with col1:
         placeholder="Paste job details here...",
         label_visibility="collapsed"
     )
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
-    st.subheader("📂 Upload Resumes")
+    st.markdown('<div class="input-panel">', unsafe_allow_html=True)
+    st.subheader("📂 Upload Candidate Portfolios")
     uploaded_files = st.file_uploader(
         "Upload PDF Resumes",
         type=["pdf"],
@@ -222,6 +246,7 @@ with col2:
         key="resume_uploader",
         label_visibility="collapsed"
     )
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Temporary session state memory for persistence
 if uploaded_files:
@@ -289,14 +314,14 @@ if st.button("🚀 Start Semantic Screening"):
         card_html = f"""
         <div class="candidate-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                <h4 style="margin: 0; color: #ffffff; font-size: 1.25rem; font-weight:600;">#{rank} — {candidate['name']}</h4>
+                <h4 style="margin: 0; color: #ffffff; font-size: 1.35rem; font-weight:600;">#{rank} — {candidate['name']}</h4>
                 <span class="badge {badge_class}">{status}</span>
             </div>
-            <p style="margin: 0.5rem 0 0.75rem 0; color: #a0aec0; font-size: 0.9rem; line-height: 1.4;">
+            <p style="margin: 0.5rem 0 0.75rem 0; color: #94a3b8; font-size: 0.95rem; line-height: 1.5;">
                 <strong>Preview:</strong> {candidate['text_snippet']}
             </p>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.8rem;">
-                <span style="font-weight: 700; color: #E94057; font-size: 1.1rem;">{score}% Match</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                <span style="font-weight: 700; color: #ec4899; font-size: 1.15rem;">{score}% Match</span>
             </div>
             <div class="progress-bar-container">
                 <div class="progress-bar-fill" style="width: {max(0, min(score, 100))}%;"></div>
