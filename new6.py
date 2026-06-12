@@ -21,20 +21,29 @@ html, body, [data-testid="stSidebar"], .stMarkdown, p, div, span {
     font-family: 'Outfit', sans-serif !important;
 }
 
-/* Header gradient style */
+/* Centered Header gradient style */
+.header-container {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-top: 1rem;
+}
+
 .main-header {
     background: linear-gradient(135deg, #8A2387 0%, #E94057 50%, #F27121 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800;
-    font-size: 3rem;
+    font-size: 3.2rem;
     margin-bottom: 0.5rem;
+    display: inline-block;
 }
 
 .subheader-text {
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     color: #a0aec0;
-    margin-bottom: 2rem;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.5;
 }
 
 /* Modern Card Styling */
@@ -44,7 +53,7 @@ html, body, [data-testid="stSidebar"], .stMarkdown, p, div, span {
     border-radius: 16px;
     padding: 1.5rem;
     margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -85,9 +94,20 @@ html, body, [data-testid="stSidebar"], .stMarkdown, p, div, span {
     border: 1px solid rgba(255, 71, 87, 0.3);
 }
 
-/* Progress bar color tweaking */
-div[data-testid="stProgress"] > div > div > div > div {
-    background-image: linear-gradient(to right, #8A2387, #E94057, #F27121);
+/* Custom progress bar container inside card */
+.progress-bar-container {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    height: 8px;
+    margin-top: 1rem;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    background: linear-gradient(90deg, #8A2387 0%, #E94057 50%, #F27121 100%);
+    height: 100%;
+    border-radius: 10px;
 }
 
 /* Sidebar premium adjustments */
@@ -102,12 +122,13 @@ div[data-testid="stProgress"] > div > div > div > div {
     color: white !important;
     border: none !important;
     border-radius: 12px !important;
-    padding: 0.6rem 2rem !important;
+    padding: 0.75rem 2rem !important;
     font-weight: 600 !important;
-    font-size: 1rem !important;
+    font-size: 1.05rem !important;
     transition: all 0.3s ease !important;
     box-shadow: 0 4px 15px rgba(233, 64, 87, 0.3) !important;
     width: 100%;
+    margin-top: 1rem;
 }
 
 .stButton>button:hover {
@@ -149,8 +170,12 @@ Required Skills:
 - Excellent Communication & Collaboration Skills"""
 
 # Header Section
-st.markdown('<div class="main-header">🤖 AI Resume Screening Agent</div>', unsafe_allow_html=True)
-st.markdown('<div class="subheader-text">Deploying semantic intelligence to rank and match applicants with jobs instantly.</div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="header-container">
+    <div class="main-header">🤖 AI Resume Screening Agent</div>
+    <div class="subheader-text">Deploying semantic intelligence to rank and match applicants with jobs instantly.</div>
+</div>
+""", unsafe_allow_html=True)
 
 # Sidebar
 st.sidebar.markdown("### ⚙️ Settings")
@@ -248,23 +273,25 @@ if st.button("🚀 Start Semantic Screening"):
             badge_class = "badge-low"
             status = "Low Match"
             
-        # Premium card markdown html representation
+        # Premium card representation with progress bar aligned inside the card container
         card_html = f"""
         <div class="candidate-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <h4 style="margin: 0; color: #ffffff; font-size: 1.25rem;">#{rank} — {candidate['name']}</h4>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <h4 style="margin: 0; color: #ffffff; font-size: 1.25rem; font-weight:600;">#{rank} — {candidate['name']}</h4>
                 <span class="badge {badge_class}">{status}</span>
             </div>
-            <p style="margin: 0.5rem 0; color: #a0aec0; font-size: 0.9rem;">
+            <p style="margin: 0.5rem 0 0.75rem 0; color: #a0aec0; font-size: 0.9rem; line-height: 1.4;">
                 <strong>Preview:</strong> {candidate['text_snippet']}
             </p>
-            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.8rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.8rem;">
                 <span style="font-weight: 700; color: #E94057; font-size: 1.1rem;">{score}% Match</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: {max(0, min(score, 100))}%;"></div>
             </div>
         </div>
         """
         st.markdown(card_html, unsafe_allow_html=True)
-        st.progress(int(max(0, min(score, 100))))
         
         report += (
             f"Rank #{rank}\n"
