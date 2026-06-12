@@ -1,0 +1,18 @@
+IBM AI ENGINEER REPORT
+============================================================
+
+Rank #1
+Candidate: Jai_Gangwar_Resume (2).pdf
+Match Score: 48.88999938964844%
+Status: 🔴 LOW MATCH
+------------------------------------------------------------
+Rank #2
+Candidate: Kanishka_Saxena.pdf
+Match Score: 7.809999942779541%
+Status: 🔴 LOW MATCH
+------------------------------------------------------------
+Rank #3
+Candidate: Black and White Clean Professional A4 Resume.pdf
+Match Score: 7.570000171661377%
+Status: 🔴 LOW MATCH
+------------------------------------------------------------

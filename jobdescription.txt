@@ -1,0 +1,53 @@
+Company: IBM
+
+Role: AI Engineer
+
+Location: Bangalore / Hybrid
+
+Experience Required:
+0-3 Years
+
+Required Skills:
+
+Python
+Machine Learning
+Deep Learning
+Generative AI
+Large Language Models (LLM)
+Prompt Engineering
+LangChain
+RAG
+Vector Database
+FAISS
+ChromaDB
+API Development
+FastAPI
+Git
+Docker
+Kubernetes
+AWS
+Azure
+
+Responsibilities:
+
+Build AI applications using LLMs
+Develop RAG pipelines
+Fine-tune and evaluate AI models
+Work with Vector Databases
+Create APIs for AI services
+Deploy AI applications using Docker and Kubernetes
+Collaborate with cross-functional teams
+Optimize model performance and inference
+
+Preferred Skills:
+
+PyTorch
+TensorFlow
+Hugging Face
+Agentic AI
+MLOps
+CI/CD
+
+Education:
+
+B.Tech / BCA / MCA / M.Tech
