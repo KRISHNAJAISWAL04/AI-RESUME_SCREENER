@@ -2,6 +2,7 @@ services:
   - type: web
     name: resume-screening-agent
     env: python
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: streamlit run new6.py --server.port $PORT --server.address 0.0.0.0
     envVars:
